@@ -7,6 +7,7 @@ package it.polito.tdp.food;
 import java.net.URL;
 import java.util.ResourceBundle;
 import it.polito.tdp.food.model.Model;
+import it.polito.tdp.food.model.Vicino;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -40,7 +41,7 @@ public class FoodController {
     private Button btnCammino; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxPorzioni"
-    private ComboBox<?> boxPorzioni; // Value injected by FXMLLoader
+    private ComboBox<String> boxPorzioni; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
@@ -54,7 +55,26 @@ public class FoodController {
     @FXML
     void doCorrelate(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Cerco porzioni correlate...");
+    	txtResult.appendText("Cerco porzioni correlate...\n");
+    	String s = this.boxPorzioni.getValue();
+    	if(s==null)
+    	{
+    		this.txtResult.appendText("Selezionare un elemento\n");
+    		return;
+    	}
+    if(	this.model.doCorrelat(s)== null)
+    {
+    	this.txtResult.appendText("Errore lettura vicizi\n");
+		return;
+    }
+    this.txtResult.appendText("LIST VICINI:\n");
+    for(Vicino v : this.model.doCorrelat(s))
+    {
+    	this.txtResult.appendText(v.toString()+"\n");
+    }
+    	
+    this.btnCammino.setDisable(false);
+	this.txtPassi.setDisable(false);
     	
     }
 
@@ -62,7 +82,35 @@ public class FoodController {
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
     	txtResult.appendText("Creazione grafo...");
+    	String s = this.txtCalorie.getText();
+    	if(s==null)
+    	{
+    		this.txtResult.appendText("Inserire le calorie!\n");
+    		return;
+    	}
+    	double num;
+    	try {
+    		if(s.contains(",")|| s.contains("."))
+    		{
+    			num= Double.parseDouble(s);
+    		}
+    		else
+    		{
+    			num= (double) Integer.parseInt(s);
+    		}
+    		
+    	} catch( NumberFormatException e)
+    	{
+    		this.txtResult.appendText("Formato non valido!\n");
+    		return;	
+    	}
     	
+    	this.model.creaGrafo(num);
+    	this.btnCorrelate.setDisable(false);
+    	this.boxPorzioni.setDisable(false);
+    	this.boxPorzioni.getItems().addAll(this.model.listVertex());    	
+    	this.txtResult.appendText("#VERTICI: "+ this.model.listVertex().size()+"\n");
+    	this.txtResult.appendText("#Archi: "+ this.model.listEdges().size()+"\n");
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -79,5 +127,10 @@ public class FoodController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	this.btnCammino.setDisable(true);
+    	this.txtPassi.setDisable(true);
+    	this.btnCorrelate.setDisable(true);
+    	this.boxPorzioni.setDisable(true);
+    	
     }
 }
