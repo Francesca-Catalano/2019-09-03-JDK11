@@ -16,7 +16,8 @@ import it.polito.tdp.food.db.FoodDao;
 public class Model {
 	private Graph<String, DefaultWeightedEdge> graph;
 	private FoodDao dao;
-	
+	private double bestPeso;
+	private List<String> bestSOlution;
 	public Model() {
 	
 		this.dao= new FoodDao();
@@ -70,6 +71,66 @@ public class Model {
 		}
 		return vicino;
 	}
+
+	public List<String> cammino(int num, String source) {
+		this.bestSOlution=new ArrayList<>();
+		this.bestPeso=0;
+		List<String> parziale = new ArrayList<>();
+		parziale.add(source);
+		System.out.print(num+"\n");
+		System.out.print(source+"\n");
+		
+		System.out.print(parziale);
+		ricorsivo(num,parziale,source,1);
+		
+		return this.bestSOlution;
+				
+	}
+
+	private void ricorsivo(int num, List<String> parziale, String source,int livello) {
+		//if(parziale.size()==num)
+		if(livello==num+1)
+		{
+			if(peso(parziale,source)>bestPeso)
+			{
+				this.bestPeso=peso(parziale,source);
+				this.bestSOlution= new ArrayList<>(parziale);
+			}
+			return;
+		}
+		
+		for(String v : Graphs.neighborListOf(this.graph, parziale.get(livello-1)))
+		{
+			if(!parziale.contains(v))
+			{
+				parziale.add(v);
+				ricorsivo(num,parziale,source,livello+1);
+				parziale.remove(parziale.size()-1);
+			}
+		}
+				
+	}
+
+
+
+	private double peso(List<String> parziale,String source) {
+		double peso=0.0;
+		/*
+		 * for(String p : parziale) { peso+=
+		 * this.graph.getEdgeWeight(this.graph.getEdge(source, p)); }
+		 */
+		
+		for(int i=1; i<parziale.size(); i++) {
+			double p = this.graph.getEdgeWeight(this.graph.getEdge(parziale.get(i-1), parziale.get(i))) ;
+			peso += p ;
+		}
+		return peso;
+	}
+
+	public double getBestPeso() {
+		return bestPeso;
+	}
+
 
 	
 	

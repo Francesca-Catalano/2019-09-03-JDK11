@@ -49,7 +49,41 @@ public class FoodController {
     @FXML
     void doCammino(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Cerco cammino peso massimo...");
+    	txtResult.appendText("Cerco cammino peso massimo...\n");
+    	String ss = this.txtPassi.getText();
+    	if(ss==null)
+    	{
+    		this.txtResult.appendText("Inserire le calorie!\n");
+    		return;
+    	}
+    	int num;
+    	try {
+    		
+    			num= Integer.parseInt(ss);
+    		
+    		
+    	} catch( NumberFormatException e)
+    	{
+    		this.txtResult.appendText("Formato non valido!\n");
+    		return;	
+    	}
+    	String s = this.boxPorzioni.getValue();
+    	if(s==null)
+    	{
+    		this.txtResult.appendText("Selezionare un elemento\n");
+    		return;
+    	}
+    	
+    	if(this.model.cammino(num,s)==null)
+    	{
+    		this.txtResult.appendText("Errore nella ricerca del cammino\n");
+    		return;
+    	}
+    	for(String sol : this.model.cammino(num,s))
+    	{
+    		this.txtResult.appendText(sol+"\n");
+    	}
+    	this.txtResult.appendText("Peso : "+this.model.getBestPeso()+"\n");
     }
 
     @FXML
